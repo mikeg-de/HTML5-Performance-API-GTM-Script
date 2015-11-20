@@ -1,16 +1,30 @@
 <script>
 /*
+HTML5 APIs
+	http://www.w3.org/TR/#tr_Web_Performance
+
 HTML5 Navigation Timing API
-	http://www.w3.org/TR/navigation-timing/
 	https://developer.mozilla.org/en-US/docs/Web/API/PerformanceTiming
 	https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp?hl=en
 	https://dvcs.w3.org/hg/webperf/raw-file/16f80e9cfd02/tests/submission/Microsoft/NavigationTiming/test_timing_attributes_ordering_simple_test.htm
+	http://www.w3.org/TR/navigation-timing/
+
+HTML5 Resource Timing API
+	http://www.w3.org/TR/resource-timing/#timing-allow-origin
 
 DOM states
 	https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded
 
 Critical Render  Path
 	https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp	
+
+W3C Test Suits
+	http://w3c-test.org/navigation-timing/
+	http://w3c-test.org/resource-timing/
+
+Additional resources
+	https://varvy.com/performance/navigation-timing-api.html
+	http://www.sitepoint.com/introduction-resource-timing-api/
 */
 
 var	now			= new Date().getTime(),
@@ -75,6 +89,7 @@ if (appCache == 0) {
 }
 
 // Redirects
+// Redirects not count for sub-domains or protocoll changes
 if (redirectCount > 0) {
 	navigationType = navigationType + ' ' + redirectCount;
 }
