@@ -26,7 +26,7 @@
       // 2nd segment: Time to first paint from first byte until DOM is parsed perceived load speed by user (w/o network latency)
       (performance.timing.responseEnd - performance.timing.responseStart) / 1000, // DOM download completed, last byte received
       (performance.timing.domInteractive - performance.timing.responseEnd) / 1000, // DOM parsing completed, ready state set to interactive, sub resources (e.g. CSS) start loading
-      (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)
+      (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)	
       (performance.timing.domContentLoadedEventStart - performance.timing.requestStart) / 1000, // Milestone 2 "DOm & CSSDOM parsed": Time from first byte until DOM is parsed
 
       // 3rd segment: Sub-resources process and render contents
@@ -115,11 +115,11 @@
   // nonInteraction: Exlude from BR calculation when event is triggered
 
   resourceDetails();
-  //console.log(resourceContribution.join("|"));
+  console.log(resourceContribution.join("|"));
   //calcResourceContribution();
-  //console.log(resourceContribution.join("|"));
+  console.log(resourceContribution.join("|"));
   roundResourceDuration();
-  //console.log(resourceContribution.join("|"));
+  console.log(resourceContribution.join("|"));
 
   dataLayer.push({
   "event": "Load Time Total",
@@ -156,21 +156,21 @@
   	http://jatindersmann.com/tag/performance-timing/
   	http://nicj.net/resourcetiming-in-practice/
   */
-
+  
   // Internal vs. External
   // Total resources (JS, CSS, IMG)
   // onresourcetimingbufferfull: browser default 150, if > 150 too many resources!?!
   function resourceDetails() {
-    ///console.log("totalresourceRegEx");
+    console.log("totalresourceRegEx");
     for (i = 0; i < resourceList.length; i++) {
-      //console.log("\n\n=================\n" + "resourceList: " + i + "\n" + resourceList[i].name);
+      console.log("\n\n=================\n" + "resourceList: " + i + "\n" + resourceList[i].name);
 
       var resource = resourceList[i],
-        resourceDomain = resource.name.match(/\b((xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}\b/i)[0],
+        resourceDomain = (resource.name != "about:blank") ? resource.name.match(/\b((xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}\b/i)[0] : "X-domain-iframe-fallback.com",
         resourceInitiator = resource.initiatorType,
         resourceExtension = (resource.name.match(/(?:\.)([A-Za-z0-9]{2,5})($|\?)/)) ? resource.name.match(/(?:\.)([A-Za-z0-9]{2,5})($|\?)/)[1] : undefined;
 
-      //console.log("resourceDomain: " + resourceDomain + "\nresourceInitiator: " + resourceInitiator + "\nresourceExtension: " + resourceExtension);
+      console.log("resourceDomain: " + resourceDomain + "\nresourceInitiator: " + resourceInitiator + "\nresourceExtension: " + resourceExtension);
 
       // Define Origin of Resource
       if (documentDomain === resourceDomain) {
@@ -180,19 +180,19 @@
       } else {
         origin = 2; // Cross domain
       }
-      //console.log("origin: " + origin);
+      console.log("origin: " + origin);
 
       // Count resource types
       for (p = 0; p < resourceRegEx.length; p++) {
         if (resourceExtension == undefined) {
           resourceCount[5]++; // Fallback for resources w/o extension
           resourceType = 5;
-          //console.log("undefined resourceType: " + resourceType);
+          console.log("undefined resourceType: " + resourceType);
           break;
         } else if (resourceExtension.match(resourceRegEx[p])) {
           resourceCount[p]++;
           resourceType = p;
-          //console.log("else resourceType: " + p);
+          console.log("else resourceType: " + p);
           break;
         }
 
@@ -200,7 +200,7 @@
 
       // Define Initiator Type
       initType = (initTypes.indexOf(resourceInitiator) === -1) ? 5 : initTypes.indexOf(resourceInitiator);
-      //console.log("initType: " + initType);
+      console.log("initType: " + initType);
 
       // Count specific resource and sum contribution of total load time
       if (resourceContribution[origin][resourceType][initType][0] === undefined) {
