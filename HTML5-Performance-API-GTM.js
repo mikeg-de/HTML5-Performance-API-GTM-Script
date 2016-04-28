@@ -26,7 +26,7 @@
       // 2nd segment: Time to first paint from first byte until DOM is parsed perceived load speed by user (w/o network latency)
       (performance.timing.responseEnd - performance.timing.responseStart) / 1000, // DOM download completed, last byte received
       (performance.timing.domInteractive - performance.timing.responseEnd) / 1000, // DOM parsing completed, ready state set to interactive, sub resources (e.g. CSS) start loading
-      (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)	
+      (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)
       (performance.timing.domContentLoadedEventStart - performance.timing.requestStart) / 1000, // Milestone 2 "DOm & CSSDOM parsed": Time from first byte until DOM is parsed
 
       // 3rd segment: Sub-resources process and render contents
@@ -45,7 +45,7 @@
     initType = undefined, // Used to write in resource array 2nd dimension
     initTypes = ["link", "img", "script", "xmlhttprequest", "iframe", "css"],
     resourceType = undefined, // Used to write in resource array 2nd dimension
-    resourceList = !(/MSIE (\d.\d+);/.test(navigator.userAgent) || window.performance.getEntriesByType == undefined) ? window.performance.getEntriesByType("resource") : undefined,
+    resourceList = !(/MSIE (\d.\d+);/.test(navigator.userAgent) || window.performance.getEntriesByType == undefined) ? window.performance.getEntriesByType("resource") : "undefined",
     resourceRegEx = ["(jpg|jpeg|png|gif|tif|tiff|webp|ico)", "css", "js", "(eot|woff|ttf|svg)", "(html|php|pl)", ".*"],
     resourceTypes = ["Image", "CSS", "JavaScript", "Font", "Document", "Fallback"],
     //resources = new Array(resourceRegEx.length+1).join('0').split('').map(parseFloat), // Create array
@@ -109,46 +109,44 @@
     navigationType = navigationType + " SSL"; // Mark SSL connections in GA event action
   }
 
-  // Syntax
-  // dataLayer.push({"event" : "eventName", "eventCategory" : "category", "eventAction" : "action", "eventLabel": "optional_label", "eventValue" : "optional_value", "nonInteractive": boolean});
-  // set unused variables to "undefined" to prevent mixing of values from different events
-  // nonInteraction: Exlude from BR calculation when event is triggered
-
-  resourceDetails();
-  console.log(resourceContribution.join("|"));
-  //calcResourceContribution();
-  console.log(resourceContribution.join("|"));
-  roundResourceDuration();
-  console.log(resourceContribution.join("|"));
+  var totalResources = (resourceList == "undefined") ? 0 : resourceList.length;
 
   dataLayer.push({
   "event": "Load Time Total",
   "eventCategory": "Page Load Time",
   "eventAction": navigationType,
-  "eventLabel": resourceList.length + "," + resourceCount + " - " + domNodes + " - " + totalLoadTime.join("|"), // Total resources, Amount of resources by type, DOM-Nodes and Performance Metrics of root document
+  "eventLabel": totalResources + "," + resourceCount + " - " + domNodes + " - " + totalLoadTime.join("|"), // Total resources, Amount of resources by type, DOM-Nodes and Performance Metrics of root document
   "eventValue": totalLoadTime[totalLoadTime.length - 1] * 1000, // Total Load Time in thousands as GA cuts floats to integer
   "nonInteractive": 1
 });
 
-  // GA-Event
-  // Category: Load Time Resource, Action: initiatorTypes + resourceRegEx, Label: resourceList[i].name, Value resourceList[i].duration/1000
-  dataLayer.push({
-  	"event": "Load Time Total Resource",
-  	"eventCategory": "Load Time Resource",
-  	"eventAction": "Resource details",
-  	"eventLabel": resourceContribution.join("|"),
-  	"eventValue": totalLoadTime[totalLoadTime.length - 1] * 1000,
-  	"nonInteractive": 1
-  });
+  if (resourceList != "undefined") {
+      resourceDetails();
+    //console.log(resourceContribution.join("|"));
+    //calcResourceContribution();
+    //console.log(resourceContribution.join("|"));
+    roundResourceDuration();
+    //console.log(resourceContribution.join("|"));
+
+	// Category: Load Time Resource, Action: initiatorTypes + resourceRegEx, Label: resourceList[i].name, Value resourceList[i].duration/1000
+    dataLayer.push({
+      "event": "Load Time Total Resource",
+      "eventCategory": "Load Time Resource",
+      "eventAction": "Resource details",
+      "eventLabel": resourceContribution.join("|"),
+      "eventValue": totalLoadTime[totalLoadTime.length - 1] * 1000,
+      "nonInteractive": 1
+    });
+  }
 
   //////////////////////////////
   // HTML5 Performance Resource Timing API
   //////////////////////////////
 
   /*	Resources
-  	http://www.w3.org/TR/resource-timing/#widl-PerformanceResourceTiming-transferSize
-  	http://www.stevesouders.com/blog/2014/11/25/serious-confusion-with-resource-timing/
-  	http://www.stevesouders.com/blog/2014/08/21/resource-timing-practical-tips/
+    http://www.w3.org/TR/resource-timing/#widl-PerformanceResourceTiming-transferSize
+    http://www.stevesouders.com/blog/2014/11/25/serious-confusion-with-resource-timing/
+    http://www.stevesouders.com/blog/2014/08/21/resource-timing-practical-tips/
   	http://www.sitepoint.com/introduction-resource-timing-api/
   	http://blog.trasatti.it/2012/12/measuring-the-speed-of-resource-loading-with-javascript-and-html5.html
   	http://www.slideshare.net/turbobytes/state-of-the-resource-timing-api
@@ -156,21 +154,21 @@
   	http://jatindersmann.com/tag/performance-timing/
   	http://nicj.net/resourcetiming-in-practice/
   */
-  
+
   // Internal vs. External
   // Total resources (JS, CSS, IMG)
   // onresourcetimingbufferfull: browser default 150, if > 150 too many resources!?!
   function resourceDetails() {
-    console.log("totalresourceRegEx");
+    //console.log("totalresourceRegEx");
     for (i = 0; i < resourceList.length; i++) {
-      console.log("\n\n=================\n" + "resourceList: " + i + "\n" + resourceList[i].name);
+      //console.log("\n\n=================\n" + "resourceList: " + i + "\n" + resourceList[i].name);
 
       var resource = resourceList[i],
         resourceDomain = (resource.name != "about:blank") ? resource.name.match(/\b((xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}\b/i)[0] : "X-domain-iframe-fallback.com",
         resourceInitiator = resource.initiatorType,
         resourceExtension = (resource.name.match(/(?:\.)([A-Za-z0-9]{2,5})($|\?)/)) ? resource.name.match(/(?:\.)([A-Za-z0-9]{2,5})($|\?)/)[1] : undefined;
 
-      console.log("resourceDomain: " + resourceDomain + "\nresourceInitiator: " + resourceInitiator + "\nresourceExtension: " + resourceExtension);
+      //console.log("resourceDomain: " + resourceDomain + "\nresourceInitiator: " + resourceInitiator + "\nresourceExtension: " + resourceExtension);
 
       // Define Origin of Resource
       if (documentDomain === resourceDomain) {
@@ -180,19 +178,19 @@
       } else {
         origin = 2; // Cross domain
       }
-      console.log("origin: " + origin);
+      //console.log("origin: " + origin);
 
       // Count resource types
       for (p = 0; p < resourceRegEx.length; p++) {
         if (resourceExtension == undefined) {
           resourceCount[5]++; // Fallback for resources w/o extension
           resourceType = 5;
-          console.log("undefined resourceType: " + resourceType);
+          //console.log("undefined resourceType: " + resourceType);
           break;
         } else if (resourceExtension.match(resourceRegEx[p])) {
           resourceCount[p]++;
           resourceType = p;
-          console.log("else resourceType: " + p);
+          //console.log("else resourceType: " + p);
           break;
         }
 
@@ -200,7 +198,7 @@
 
       // Define Initiator Type
       initType = (initTypes.indexOf(resourceInitiator) === -1) ? 5 : initTypes.indexOf(resourceInitiator);
-      console.log("initType: " + initType);
+      //console.log("initType: " + initType);
 
       // Count specific resource and sum contribution of total load time
       if (resourceContribution[origin][resourceType][initType][0] === undefined) {
