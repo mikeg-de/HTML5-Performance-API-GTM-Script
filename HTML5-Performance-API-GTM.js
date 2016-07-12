@@ -8,7 +8,7 @@
   	https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp?hl=en
   	https://dvcs.w3.org/hg/webperf/raw-file/16f80e9cfd02/tests/submission/Microsoft/NavigationTiming/test_timing_attributes_ordering_simple_test.htm
   	https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded
-  	https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp
+  	https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp	
   */
   var now = new Date().getTime(),
     navigationType = performance.navigation.type,
@@ -26,7 +26,7 @@
       // 2nd segment: Time to first paint from first byte until DOM is parsed perceived load speed by user (w/o network latency)
       (performance.timing.responseEnd - performance.timing.responseStart) / 1000, // DOM download completed, last byte received
       (performance.timing.domInteractive - performance.timing.responseEnd) / 1000, // DOM parsing completed, ready state set to interactive, sub resources (e.g. CSS) start loading
-      (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)
+      (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)	
       (performance.timing.domContentLoadedEventStart - performance.timing.requestStart) / 1000, // Milestone 2 "DOm & CSSDOM parsed": Time from first byte until DOM is parsed
 
       // 3rd segment: Sub-resources process and render contents
@@ -45,7 +45,7 @@
     initType = undefined, // Used to write in resource array 2nd dimension
     initTypes = ["link", "img", "script", "xmlhttprequest", "iframe", "css"],
     resourceType = undefined, // Used to write in resource array 2nd dimension
-    resourceList = !(/MSIE (\d.\d+);/.test(navigator.userAgent) || window.performance.getEntriesByType == undefined) ? window.performance.getEntriesByType("resource") : "undefined",
+    resourceList = !(/MSIE (\d.\d+);/.test(navigator.userAgent) || window.performance.getEntriesByType == undefined) ? window.performance.getEntriesByType("resource") : undefined,
     resourceRegEx = ["(jpg|jpeg|png|gif|tif|tiff|webp|ico)", "css", "js", "(eot|woff|ttf|svg)", "(html|php|pl)", ".*"],
     resourceTypes = ["Image", "CSS", "JavaScript", "Font", "Document", "Fallback"],
     //resources = new Array(resourceRegEx.length+1).join('0').split('').map(parseFloat), // Create array
@@ -109,8 +109,12 @@
     navigationType = navigationType + " SSL"; // Mark SSL connections in GA event action
   }
 
-  var totalResources = (resourceList == "undefined") ? 0 : resourceList.length;
+  var totalResources = (resourceList === undefined) ? 0 : resourceList.length;
 
+  if (resourceList !== undefined) {
+    resourceDetails();
+  }
+  
   dataLayer.push({
   "event": "Load Time Total",
   "eventCategory": "Page Load Time",
@@ -120,14 +124,13 @@
   "nonInteractive": 1
 });
 
-  if (resourceList != "undefined") {
-      resourceDetails();
+  if (resourceList !== undefined) {
     //console.log(resourceContribution.join("|"));
     //calcResourceContribution();
     //console.log(resourceContribution.join("|"));
     roundResourceDuration();
     //console.log(resourceContribution.join("|"));
-
+    
 	// Category: Load Time Resource, Action: initiatorTypes + resourceRegEx, Label: resourceList[i].name, Value resourceList[i].duration/1000
     dataLayer.push({
       "event": "Load Time Total Resource",
@@ -154,7 +157,7 @@
   	http://jatindersmann.com/tag/performance-timing/
   	http://nicj.net/resourcetiming-in-practice/
   */
-
+  
   // Internal vs. External
   // Total resources (JS, CSS, IMG)
   // onresourcetimingbufferfull: browser default 150, if > 150 too many resources!?!
@@ -182,7 +185,7 @@
 
       // Count resource types
       for (p = 0; p < resourceRegEx.length; p++) {
-        if (resourceExtension == undefined) {
+        if (resourceExtension === undefined) {
           resourceCount[5]++; // Fallback for resources w/o extension
           resourceType = 5;
           //console.log("undefined resourceType: " + resourceType);
