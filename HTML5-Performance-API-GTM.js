@@ -31,7 +31,7 @@
             (performance.timing.responseEnd - performance.timing.responseStart) / 1000, // DOM download completed, last byte received
             (performance.timing.domInteractive - performance.timing.responseEnd) / 1000, // DOM parsing completed, ready state set to interactive, sub resources (e.g. CSS) start loading
             (performance.timing.domContentLoadedEventStart - performance.timing.domInteractive) / 1000, // Time to 1st paint – Parsed & executed Blocking resources (DOM, CSS, synchronous scripts)
-            (performance.timing.domContentLoadedEventStart - performance.timing.requestStart) / 1000, // Milestone 2 "DOm & CSSDOM parsed": Time from first byte until DOM is parsed
+            (performance.timing.domContentLoadedEventStart - performance.timing.requestStart) / 1000, // Milestone 2 "DOM & CSSDOM parsed": Time from first byte until DOM is parsed
 
             // 3rd segment: Sub-resources process and render contents
             (performance.timing.domContentLoadedEventEnd - performance.timing.domContentLoadedEventStart) / 1000, // Executed all non-blocking resources
@@ -119,19 +119,8 @@
     }
 
     // Implementation to distinguish XHR loads i.e. on product pages
-
-    // Not working on Andromeda CPS as hashChange is used only
-    /*window.onpopstate = function checkXHRLoad(event) {
-      historyChangeCountNew = window.history.length;
-      console.log("History old: " + historyChangeCountOld + " | History new: " + historyChangeCountNew);
-
-      loadTimeXhrCheckNew = JSON.stringify(totalLoadTime);
-      console.log("Load time old: " + loadTimeXhrCheckOld + " | Load time new: " + loadTimeXhrCheckNew);
-    };*/
-
     // Thanks to Steve Field, a colleageu of mine at Brady's
     window[listenerType](hashChangeType, function hashChange(event) {
-        //window.listenerType(hashChangeType), function hashChange(event){
         now = new Date().getTime(); // Equivalent to performance.timing.navigationStart
         totalLoadTime[totalLoadTime.length - 1] = (now - oldNow) / 1000; // Calc new total load time
         oldNow = now; // Save current total load time
