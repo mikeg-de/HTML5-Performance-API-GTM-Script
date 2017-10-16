@@ -129,7 +129,7 @@
       console.log("Load time old: " + loadTimeXhrCheckOld + " | Load time new: " + loadTimeXhrCheckNew);
     };*/
 
-    // Thanks to Steve Field xD
+    // Thanks to Steve Field, a colleageu of mine at Brady's
     window[listenerType](hashChangeType, function hashChange(event) {
         //window.listenerType(hashChangeType), function hashChange(event){
         now = new Date().getTime(); // Equivalent to performance.timing.navigationStart
