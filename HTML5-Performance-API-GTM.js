@@ -44,7 +44,8 @@
 
         redirectCount = performance.navigation.redirectCount, // Amount of redirects
         domNodes = document.getElementsByTagName('*').length, // DOM-Complexity
-        documentDomain = document.location.hostname, // GTM Macro used to determine document origin
+        documentProtocol = window.location.protocol, // Used to distinguish mixed protocols in resource check
+        documentDomain = window.location.hostname, // GTM Macro used to determine document origin
         origin = undefined, // Used to write in resource array 1st dimension
         initType = undefined, // Used to write in resource array 2nd dimension
         initTypes = ["link", "img", "script", "xmlhttprequest", "iframe", "css"],
@@ -194,6 +195,7 @@
             //console.log("\n\n=================\n" + "resourceList: " + i + "\n" + resourceList[i].name);
 
             var resource = resourceList[i],
+                resourceProtocol = (resource.name != "about:blank") ? resource.name.match(/^\w{4,5}\W/i)[0] : "X-protocol-fallback",
                 resourceDomain = (resource.name != "about:blank") ? resource.name.match(/\b((xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}\b/i)[0] : "X-domain-iframe-fallback.com",
                 resourceInitiator = resource.initiatorType,
                 resourceExtension = (resource.name.match(/(?:\.)([A-Za-z0-9]{2,5})($|\?)/)) ? resource.name.match(/(?:\.)([A-Za-z0-9]{2,5})($|\?)/)[1] : undefined;
@@ -247,6 +249,17 @@
 
             // Count mixed protocols!!!
             //resourceContribution[origin][initType][resourceType][5] = ((performance.timing.secureConnectionStart != 0 && resource.secureConnectionStart = 0) || (performance.timing.secureConnectionStart = 0 && resource.secureConnectionStart != 0)) ? ++ : ;
+            if (resourceProtocol === "https:" && resourceProtocol !== documentProtocol) {
+              //
+              dataLayer.push({
+                  "event": "Mixed protocols",
+                  "eventCategory": "Mixed protocols",
+                  "eventAction": "Origin: " + documentProtocol + documentDomain + " | Resource: " + resourceProtocol + resourceDomain,
+                  "eventLabel": "Resource: " + resource.name, // Fully qualified resource URL
+                  "eventValue": undefined, // Reset to prevent event dimension mixture
+                  "nonInteractive": 1
+              });
+            }
 
             // Calculate contribution of resource duration in 4th array position
         }
