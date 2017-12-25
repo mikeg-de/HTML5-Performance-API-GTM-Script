@@ -108,9 +108,14 @@
         navigationType = navigationType + ' ' + redirectCount;
     }
 
-    if (performance.timing.secureConnectionStart > 0) {
-        totalLoadTime[5] = (performance.timing.secureConnectionStart - performance.timing.connectStart) / 1000; // Calculate SSL-Negotiation time
-        navigationType = navigationType + " SSL"; // Mark SSL connections in GA event action
+    if (documentProtocol === "https:") {
+      totalLoadTime[5] = (performance.timing.secureConnectionStart - performance.timing.connectStart) / 1000;
+      if (performance.timing.secureConnectionStart < 0) {
+        totalLoadTime[5] = 0; // Without reset it would be greatly negative
+        navigationType = navigationType + " SSL Cached";
+      } else {
+          navigationType = navigationType + " SSL"; // Mark SSL connections in GA event action
+      }
     }
 
     var totalResources = (resourceList === undefined) ? 0 : resourceList.length;
