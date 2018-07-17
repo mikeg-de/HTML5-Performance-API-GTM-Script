@@ -1,20 +1,20 @@
-<script>
+<script type="text/javascript">
     //////////////////////////////
-    // HTML5 Performance Navitaion Timing API
+    // HTML5 Performance Navigation Timing API
     //////////////////////////////
-    /*	Resources
-                http://www.w3.org/TR/navigation-timing/
-                https://developer.mozilla.org/en-US/docs/Web/API/PerformanceTiming
-                https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp?hl=en
-                https://dvcs.w3.org/hg/webperf/raw-file/16f80e9cfd02/tests/submission/Microsoft/NavigationTiming/test_timing_attributes_ordering_simple_test.htm
-                https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded
-                https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp
-            */
+    /* Resources
+      http://www.w3.org/TR/navigation-timing/
+      https://developer.mozilla.org/en-US/docs/Web/API/PerformanceTiming
+      https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp?hl=en
+      https://dvcs.w3.org/hg/webperf/raw-file/16f80e9cfd02/tests/submission/Microsoft/NavigationTiming/test_timing_attributes_ordering_simple_test.htm
+      https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded
+      https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp
+    */
     var listenerType = "addEventListener" in window ? "addEventListener" : "attachEvent",
-        hashChangeType = listenerType == 'addEventListener' ? 'hashchange' : 'onhashchange',
+        hashChangeType = listenerType == "addEventListener" ? "hashchange" : "onhashchange",
         now = new Date().getTime(),
         oldNow = now, // Used for XHR loads
-        xhrCounter = 0, // Used to count multiple XHR's i.e. on multiple changes of drop downs on CPS
+        xhrCounter = 0, // Used to count multiple XHR’s i.e. on multiple changes of drop downs on CPS
         navigationType = performance.navigation.type,
         totalLoadTime = [
             // 1st segment: Server & Network latency
@@ -43,7 +43,7 @@
         ], // Total load time
 
         redirectCount = performance.navigation.redirectCount, // Amount of redirects
-        domNodes = document.getElementsByTagName('*').length, // DOM-Complexity
+        domNodes = document.getElementsByTagName("*").length, // DOM-Complexity
         documentProtocol = window.location.protocol, // Used to distinguish mixed protocols in resource check
         documentDomain = window.location.hostname, // GTM Macro used to determine document origin
         origin = undefined, // Used to write in resource array 1st dimension
@@ -53,8 +53,8 @@
         resourceList = !(/MSIE (\d.\d+);/.test(navigator.userAgent) || window.performance.getEntriesByType === undefined) ? window.performance.getEntriesByType("resource") : undefined,
         resourceRegEx = ["(jpg|jpeg|png|gif|tif|tiff|webp|ico)", "css", "js", "(eot|woff|ttf|svg)", "(html|php|pl)", ".*"],
         resourceTypes = ["Image", "CSS", "JavaScript", "Font", "Document", "Fallback"],
-        //resources = new Array(resourceRegEx.length+1).join('0').split('').map(parseFloat), // Create array
-        resourceCount = new Array(resourceRegEx.length + 1).join('0').split("").map(parseFloat); // Array to count occurencies of resourceTypes
+        //resources = new Array(resourceRegEx.length+1).join("0").split("").map(parseFloat), // Create array
+        resourceCount = new Array(resourceRegEx.length + 1).join("0").split("").map(parseFloat); // Array to count occurencies of resourceTypes
 
     // Commented as navigation type takes precedence
     //loadTimeEventAction = parseFloat((Math.round(totalLoadTime*2)/2).toFixed(1)); // GA event action, round to first decimal in .5 steps for convenient to prevent cluttering
@@ -100,12 +100,12 @@
 
     // Mark initial request
     if (totalLoadTime[2] === 0) {
-        navigationType = navigationType + ' Initial';
+        navigationType = navigationType + " Initial";
     }
 
     // Redirects
     if (redirectCount > 0) {
-        navigationType = navigationType + ' ' + redirectCount;
+        navigationType = navigationType + " " + redirectCount;
     }
 
     if (documentProtocol === "https:") {
@@ -125,7 +125,7 @@
     }
 
     // Implementation to distinguish XHR loads i.e. on product pages
-    // Thanks to Steve Field, a colleageu of mine at Brady's
+    // Thanks to Steve Field, a colleageu of mine at Brady’s
     window[listenerType](hashChangeType, function hashChange(event) {
         now = new Date().getTime(); // Equivalent to performance.timing.navigationStart
         totalLoadTime[totalLoadTime.length - 1] = (now - oldNow) / 1000; // Calc new total load time
@@ -136,7 +136,7 @@
         if (xhrCounter === 1) {
             navigationType = navigationType + " XHR";
         } // Mark XHR load in GA event action
-        // A counter should increase if multiple XHR's happened
+        // A counter should increase if multiple XHR’s happened
 
         dataLayer.push({
             "event": "Load Time Total",
@@ -179,7 +179,7 @@
     // HTML5 Performance Resource Timing API
     //////////////////////////////
 
-    /*	Resources
+    /* Resources
       http://www.w3.org/TR/resource-timing/#widl-PerformanceResourceTiming-transferSize
       http://www.stevesouders.com/blog/2014/11/25/serious-confusion-with-resource-timing/
       http://www.stevesouders.com/blog/2014/08/21/resource-timing-practical-tips/
@@ -210,7 +210,7 @@
             // Define Origin of Resource
             if (documentDomain === resourceDomain) {
                 origin = 0; // Same origin
-            } else if (new RegExp(documentDomain.replace(/^www\./, ''), "i").test(resourceDomain)) {
+            } else if (new RegExp(documentDomain.replace(/^www\./, ""), "i").test(resourceDomain)) {
                 origin = 1; // Sub domain
             } else {
                 origin = 2; // Cross domain
